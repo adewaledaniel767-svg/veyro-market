@@ -274,4 +274,889 @@ Category
 <option>Home</option>
 </select>
 
-</
+</label>
+
+<label>
+Image URL
+<input id="sellerImage" placeholder="https://...">
+</label>
+
+<button class="btn dark">
+Add Product
+</button>
+
+</form>
+
+<h3 style="margin-top:20px">
+My Products
+</h3>
+
+<div id="myProducts"></div>
+
+</div>
+</div>
+
+
+<script>
+
+"use strict";
+
+var products=[
+
+{
+id:1,
+name:"Smartphone",
+price:150000,
+category:"Electronics",
+image:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+description:"A modern smartphone for communication, entertainment and everyday use."
+},
+
+{
+id:2,
+name:"Wireless Headphones",
+price:25000,
+category:"Electronics",
+image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e",
+description:"Wireless headphones for music, videos and everyday listening."
+},
+
+{
+id:3,
+name:"Gaming Mouse",
+price:15000,
+category:"Computers",
+image:"https://images.unsplash.com/photo-1527814050087-3793815479db",
+description:"A responsive gaming mouse for computers and gaming."
+},
+
+{
+id:4,
+name:"Fashion Sneakers",
+price:35000,
+category:"Fashion",
+image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+description:"Stylish sneakers for everyday casual wear."
+},
+
+{
+id:5,
+name:"Smart Watch",
+price:45000,
+category:"Electronics",
+image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+description:"A modern smartwatch for everyday use."
+},
+
+{
+id:6,
+name:"Laptop",
+price:450000,
+category:"Computers",
+image:"https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
+description:"A laptop for school, work and entertainment."
+}
+
+];
+
+var cart=[];
+var category="All";
+var wishlist=[];
+
+
+function money(number){
+return "₦"+Number(number||0).toLocaleString();
+}
+
+
+function getSaved(key,fallback){
+
+try{
+
+var data=localStorage.getItem(key);
+
+return data ? JSON.parse(data) : fallback;
+
+}catch(error){
+
+return fallback;
+
+}
+
+}
+
+
+function saveData(key,value){
+
+try{
+
+localStorage.setItem(
+key,
+JSON.stringify(value)
+);
+
+}catch(error){}
+
+}
+
+
+var savedProducts=
+getSaved("veyroSellerProducts",[]);
+
+
+if(Array.isArray(savedProducts)){
+
+savedProducts.forEach(
+function(product){
+
+products.push(product);
+
+});
+
+}
+
+
+wishlist=
+getSaved("veyroWishlist",[]);
+
+
+if(!Array.isArray(wishlist)){
+wishlist=[];
+}
+
+
+function showProducts(){
+
+var search=
+document
+.getElementById("search")
+.value
+.toLowerCase()
+.trim();
+
+var price=
+document
+.getElementById("priceFilter")
+.value;
+
+var sort=
+document
+.getElementById("sortFilter")
+.value;
+
+
+var list=
+products.filter(
+function(product){
+
+var categoryOK=
+category==="All" ||
+product.category===category;
+
+var searchOK=
+product.name
+.toLowerCase()
+.indexOf(search)!==-1 ||
+
+product.category
+.toLowerCase()
+.indexOf(search)!==-1;
+
+var priceOK=true;
+
+
+if(price==="under"){
+priceOK=product.price<50000;
+}
+
+if(price==="mid"){
+priceOK=
+product.price>=50000 &&
+product.price<=200000;
+}
+
+if(price==="over"){
+priceOK=product.price>200000;
+}
+
+
+return categoryOK &&
+searchOK &&
+priceOK;
+
+});
+
+
+if(sort==="low"){
+
+list.sort(
+function(a,b){
+return a.price-b.price;
+});
+
+}
+
+
+if(sort==="high"){
+
+list.sort(
+function(a,b){
+return b.price-a.price;
+});
+
+}
+
+
+var box=
+document.getElementById("products");
+
+box.innerHTML="";
+
+
+if(list.length===0){
+
+box.innerHTML="<p>No products found.</p>";
+
+return;
+
+}
+
+
+list.forEach(
+function(product){
+
+var liked=
+wishlist.some(
+function(item){
+return item.id===product.id;
+});
+
+
+var card=
+document.createElement("div");
+
+card.className="product";
+
+
+card.innerHTML=`
+
+<button class="heart">
+${liked ? "❤️":"♡"}
+</button>
+
+<img
+src="${product.image}"
+alt="${product.name}">
+
+<h3>
+${product.name}
+</h3>
+
+<div class="muted">
+${product.category}
+</div>
+
+<div class="muted">
+${
+product.seller
+? "Seller: "+product.seller
+: "Veyro Market"
+}
+</div>
+
+<div class="price">
+${money(product.price)}
+</div>
+
+<button class="btn light detailsBtn">
+View Details
+</button>
+
+<button class="btn dark addBtn">
+Add to Cart
+</button>
+
+`;
+
+
+card
+.querySelector(".heart")
+.onclick=function(){
+
+if(liked){
+
+wishlist=
+wishlist.filter(
+function(item){
+return item.id!==product.id;
+});
+
+}else{
+
+wishlist.push(product);
+
+}
+
+saveData(
+"veyroWishlist",
+wishlist
+);
+
+showProducts();
+
+};
+
+
+card
+.querySelector(".detailsBtn")
+.onclick=function(){
+
+showDetails(product);
+
+};
+
+
+card
+.querySelector(".addBtn")
+.onclick=function(){
+
+addCart(product);
+
+};
+
+
+box.appendChild(card);
+
+});
+
+}
+
+
+function addCart(product){
+
+var item=
+cart.find(
+function(x){
+return x.id===product.id;
+});
+
+
+if(item){
+
+item.qty++;
+
+}else{
+
+cart.push({
+
+id:product.id,
+product:product,
+qty:1
+
+});
+
+}
+
+
+updateCart();
+
+alert(
+product.name+
+" added to cart!"
+);
+
+}
+
+
+function updateCart(){
+
+var count=
+cart.reduce(
+function(total,item){
+return total+item.qty;
+},
+0
+);
+
+
+document
+.getElementById("cartBtn")
+.textContent=
+"🛒 "+count;
+
+
+var box=
+document.getElementById("cartItems");
+
+box.innerHTML="";
+
+
+var total=0;
+
+
+if(cart.length===0){
+
+box.innerHTML=
+'<p style="text-align:center;padding:25px;color:#6b7280">Your cart is empty.</p>';
+
+document
+.getElementById("total")
+.textContent="₦0";
+
+return;
+
+}
+
+
+cart.forEach(
+function(item,index){
+
+total+=
+item.product.price*
+item.qty;
+
+
+var row=
+document.createElement("div");
+
+row.className="cartItem";
+
+
+row.innerHTML=`
+
+<img
+src="${item.product.image}"
+alt="${item.product.name}">
+
+<div>
+
+<b>
+${item.product.name}
+</b>
+
+<div class="muted">
+${money(item.product.price)} each
+</div>
+
+<div class="qty">
+
+<button class="minus">
+−
+</button>
+
+<span>
+${item.qty}
+</span>
+
+<button class="plus">
++
+</button>
+
+</div>
+
+</div>
+
+<button class="remove">
+Remove
+</button>
+
+`;
+
+
+row
+.querySelector(".plus")
+.onclick=function(){
+
+item.qty++;
+updateCart();
+
+};
+
+
+row
+.querySelector(".minus")
+.onclick=function(){
+
+item.qty--;
+
+if(item.qty<=0){
+
+cart.splice(index,1);
+
+}
+
+updateCart();
+
+};
+
+
+row
+.querySelector(".remove")
+.onclick=function(){
+
+cart.splice(index,1);
+updateCart();
+
+};
+
+
+box.appendChild(row);
+
+});
+
+
+document
+.getElementById("total")
+.textContent=
+money(total);
+
+}
+
+
+function showDetails(product){
+
+var box=
+document.getElementById("details");
+
+
+box.innerHTML=`
+
+<img
+src="${product.image}"
+alt="${product.name}">
+
+<div>
+
+<div class="muted">
+${product.category}
+</div>
+
+<h2>
+${product.name}
+</h2>
+
+<div class="price">
+${money(product.price)}
+</div>
+
+<p>
+${product.description}
+</p>
+
+<button
+class="btn dark"
+id="detailAdd">
+
+Add to Cart
+
+</button>
+
+</div>
+
+`;
+
+
+document
+.getElementById("detailAdd")
+.onclick=function(){
+
+addCart(product);
+
+closeModal("detailsModal");
+
+};
+
+
+openModal("detailsModal");
+
+}
+
+
+function openModal(id){
+
+document
+.getElementById(id)
+.classList.add("show");
+
+}
+
+
+function closeModal(id){
+
+document
+.getElementById(id)
+.classList.remove("show");
+
+}
+
+
+document
+.getElementById("cartBtn")
+.onclick=function(){
+
+updateCart();
+openModal("cartModal");
+
+};
+
+
+document
+.getElementById("sellerBtn")
+.onclick=function(){
+
+showMyProducts();
+openModal("sellerModal");
+
+};
+
+
+document
+.getElementById("search")
+.oninput=showProducts;
+
+
+document
+.getElementById("priceFilter")
+.onchange=showProducts;
+
+
+document
+.getElementById("sortFilter")
+.onchange=showProducts;
+
+
+document
+.querySelectorAll(".cat")
+.forEach(
+function(button){
+
+button.onclick=function(){
+
+document
+.querySelectorAll(".cat")
+.forEach(
+function(item){
+
+item.classList.remove("active");
+
+});
+
+
+button.classList.add("active");
+
+category=
+button.getAttribute("data-cat");
+
+showProducts();
+
+};
+
+});
+
+
+document
+.querySelectorAll("[data-close]")
+.forEach(
+function(button){
+
+button.onclick=function(){
+
+closeModal(
+button.getAttribute("data-close")
+);
+
+};
+
+});
+
+
+document
+.querySelectorAll(".overlay")
+.forEach(
+function(overlay){
+
+overlay.onclick=function(event){
+
+if(event.target===overlay){
+
+overlay.classList.remove("show");
+
+}
+
+};
+
+});
+
+
+document
+.getElementById("checkoutBtn")
+.onclick=function(){
+
+if(cart.length===0){
+
+alert("Your cart is empty.");
+return;
+
+}
+
+closeModal("cartModal");
+
+openModal("checkoutModal");
+
+};
+
+
+document
+.getElementById("checkoutForm")
+.onsubmit=function(event){
+
+event.preventDefault();
+
+alert(
+"Demo order placed successfully!"
+);
+
+cart=[];
+
+updateCart();
+
+event.target.reset();
+
+closeModal("checkoutModal");
+
+};
+
+
+document
+.getElementById("sellerForm")
+.onsubmit=function(event){
+
+event.preventDefault();
+
+
+var product={
+
+id:Date.now(),
+
+seller:
+document
+.getElementById("sellerName")
+.value
+.trim(),
+
+name:
+document
+.getElementById("sellerProduct")
+.value
+.trim(),
+
+price:
+Number(
+document
+.getElementById("sellerPrice")
+.value
+),
+
+category:
+document
+.getElementById("sellerCat")
+.value,
+
+image:
+document
+.getElementById("sellerImage")
+.value
+.trim() ||
+
+"https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+
+description:
+"Product listed by a Veyro Market seller."
+
+};
+
+
+products.push(product);
+
+savedProducts.push(product);
+
+
+saveData(
+"veyroSellerProducts",
+savedProducts
+);
+
+
+event.target.reset();
+
+showProducts();
+
+showMyProducts();
+
+alert(
+"Product added successfully!"
+);
+
+};
+
+
+function showMyProducts(){
+
+var box=
+document.getElementById("myProducts");
+
+
+var mine=
+products.filter(
+function(product){
+return product.seller;
+});
+
+
+if(mine.length===0){
+
+box.innerHTML=
+'<p class="muted">No products added yet.</p>';
+
+return;
+
+}
+
+
+box.innerHTML="";
+
+
+mine.forEach(
+function(product){
+
+var row=
+document.createElement("div");
+
+row.style.padding="10px 0";
+
+row.style.borderBottom=
+"1px solid #eee";
+
+
+row.innerHTML=
+"<b>"+
+product.name+
+"</b> — "+
+money(product.price);
+
+
+box.appendChild(row);
+
+});
+
+}
+
+
+showProducts();
+
+updateCart();
+
+</script>
+
+</body>
+  </html>
