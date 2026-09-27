@@ -1,302 +1,277 @@
 <!DOCTYPE html>
-< lang="en">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Veyro Market</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>Veyro Market</title>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#111827}
+header{position:sticky;top:0;z-index:10;background:#111827;color:white;padding:14px 5%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:23px;font-weight:800}
+.headBtns{display:flex;gap:8px}
+button{border:0;cursor:pointer}
+.hbtn{background:#1f2937;color:white;padding:10px 12px;border-radius:9px;font-weight:700}
+.hero{text-align:center;background:white;padding:50px 18px 35px}
+.hero h1{font-size:42px;margin:0 0 14px}
+.hero p{color:#6b7280;font-size:18px}
+.search{width:90%;max-width:650px;padding:16px 20px;border:2px solid #e5e7eb;border-radius:30px;font-size:16px;outline:none}
+.section{max-width:1200px;margin:auto;padding:25px 5%}
+.section h2{margin:0 0 18px}
+.cats{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+.cat{padding:11px 16px;border-radius:25px;background:white;border:1px solid #ddd;white-space:nowrap}
+.cat.active{background:#111827;color:white}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.filters select{padding:11px;border:1px solid #ddd;border-radius:8px;background:white}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.product{background:white;border:1px solid #e5e7eb;border-radius:15px;padding:12px;position:relative;box-shadow:0 4px 12px #0000000d}
+.product img{width:100%;height:180px;object-fit:cover;border-radius:10px}
+.product h3{margin:10px 0 5px}
+.muted{color:#6b7280;font-size:13px}
+.price{font-weight:800;font-size:18px;margin:10px 0}
+.heart{position:absolute;right:10px;top:10px;width:38px;height:38px;border-radius:50%;background:white;font-size:20px;box-shadow:0 2px 8px #0002}
+.btn{width:100%;padding:11px;border-radius:8px;font-weight:700;margin-top:7px}
+.dark{background:#111827;color:white}
+.light{background:#eff6ff;color:#2563eb}
+footer{background:#111827;color:white;text-align:center;padding:35px;margin-top:30px}
+.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:30;padding:15px;overflow:auto}
+.overlay.show{display:flex;align-items:flex-start;justify-content:center}
+.modal{background:white;width:100%;max-width:650px;margin:20px auto;border-radius:16px;padding:20px}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.close{width:38px;height:38px;border-radius:50%;background:#eee;font-size:20px}
+.cartItem{display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #eee}
+.cartItem img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+.qty{display:flex;gap:8px;align-items:center;margin-top:7px}
+.qty button{padding:4px 10px;background:#e5e7eb;border-radius:6px}
+.remove{background:#fee2e2;color:#dc2626;padding:7px;border-radius:6px}
+.total{display:flex;justify-content:space-between;font-size:20px;font-weight:800;padding:18px 0}
+.details{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.details img{width:100%;height:300px;object-fit:cover;border-radius:10px}
+.details p{line-height:1.6;color:#6b7280}
+.form{display:grid;gap:12px}
+.form label{font-size:13px;font-weight:bold}
+.form input,.form textarea,.form select{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px}
+.form textarea{min-height:90px}
+.notice{background:#eff6ff;color:#1d4ed8;padding:12px;border-radius:8px;margin-bottom:15px}
 
-    body {
-      background: #f5f5f5;
-      color: #111;
-    }
+@media(min-width:700px){
+.grid{grid-template-columns:repeat(4,1fr)}
+}
 
-    header {
-      background: #111;
-      color: white;
-      padding: 18px 6%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 25px;
-      font-weight: bold;
-    }
-
-    .cart {
-      font-size: 24px;
-    }
-
-    .hero {
-      text-align: center;
-      padding: 45px 20px 30px;
-    }
-
-    .hero h1 {
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
-
-    .hero p {
-      font-size: 17px;
-      color: #555;
-      margin-bottom: 25px;
-    }
-
-    .search {
-      width: 90%;
-      max-width: 550px;
-      padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 30px;
-      font-size: 16px;
-      outline: none;
-    }
-
-    .categories {
-      padding: 20px 6%;
-    }
-
-    .categories h2 {
-      margin-bottom: 15px;
-    }
-
-    .category-list {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-    }
-
-    .category {
-      background: white;
-      padding: 12px 18px;
-      border-radius: 20px;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .products {
-      padding: 25px 6%;
-    }
-
-    .products h2 {
-      margin-bottom: 20px;
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-    }
-
-    .product {
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-  .product-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 12px;
-  display: block;
-  }
-    }
-
-    .product h3 {
-      margin-bottom: 8px;
-    }
-
-    .price {
-      font-weight: bold;
-      margin-bottom: 12px;
-    }
-
-    .button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #111;
-      color: white;
-      font-size: 14px;
-    }
-
-    @media (min-width: 700px) {
-      .product-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-  </style>
+@media(max-width:699px){
+.hero h1{font-size:36px}
+.details{grid-template-columns:1fr}
+.filters{grid-template-columns:1fr}
+.details img{height:260px}
+}
+</style>
 </head>
 
-<>
+<body>
 
-  <header>
-    <div class="logo">Veyro Market</div>
-    <div class="cart">🛒</div>
-  </header>
+<header>
+<div class="logo">Veyro Market</div>
 
-  <section class="hero">
-    <h1>Shop Everything You Love</h1>
-    <p>Discover products from sellers around you.</p>
-
-    <input
-      class="search"
-      type="text"
-      placeholder="Search for products..."
-    >
-  </section>
-
-  <section class="categories">
-    <h2>Categories</h2>
-
-    <div class="category-list">
-      <div class="category">📱 Electronics</div>
-      <div class="category">👕 Fashion</div>
-      <div class="category">🍔 Food</div>
-      <div class="category">💻 Computers</div>
-      <div class="category">🏠 Home</div>
-    </div>
-  </section>
-
-  <section class="products">
-    <h2>Featured Products</h2>
-
-    <div class="product-grid">
-
-      <div class="product">
-        <img class="product-image" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9" alt="Smartphone">
-        <h3>Smartphone</h3>
-        <div class="price">₦150,000</div>
-        <button class="button">Add to Cart</button>
-      </div>
-
-      <div class="product">
-      <img class="product-image" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e" alt="Wireless Headphones">
-        <h3>Wireless Headphones</h3>
-        <div class="price">₦25,000</div>
-        <button class="button">Add to Cart</button>
-      </div>
-
-      <div class="product">
-        <img class="product-image" src="https://images.unsplash.com/photo-1527814050087-3793815479db" alt="Gaming Mouse">
-        <h3>Gaming Mouse</h3>
-        <div class="price">₦15,000</div>
-        <button class="button">Add to Cart</button>
-      </div>
-
-      <div class="product">
-        <img class="product-image" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" alt="Fashion Sneakers">
-        <h3>Fashion Sneakers</h3>
-        <div class="price">₦35,000</div>
-        <button class="button">Add to Cart</button>
-      </div>
-
-    </div>
-  </section>
-<div id="cartBox" style="display:none; background:white; padding:20px; margin:20px 6%; border-radius:12px;">
-  <h2>Your Cart 🛒</h2>
-  <p id="cartItems">Your cart is empty.</p>
-  <h3 id="cartTotal">Total: ₦0</h3>
-  <button onclick="closeCart()">Close Cart</button>
+<div class="headBtns">
+<button class="hbtn" id="sellerBtn">🏪 Seller</button>
+<button class="hbtn" id="cartBtn">🛒 0</button>
 </div>
-<script>
-let cartProducts = [];
+</header>
 
-const cart = document.querySelector(".cart");
-const buttons = document.querySelectorAll(".button");
-const cartBox = document.getElementById("cartBox");
-const cartItems = document.getElementById("cartItems");
-const cartTotal = document.getElementById("cartTotal");
+<section class="hero">
+<h1>Shop Everything<br>You Love</h1>
+<p>Discover products from sellers around you.</p>
 
-buttons.forEach(function(button) {
-  button.addEventListener("click", function() {
+<input
+class="search"
+id="search"
+placeholder="Search for products..."
+>
+</section>
 
-    const product = button.parentElement;
-    const name = product.querySelector("h3").textContent;
-    const priceText = product.querySelector(".price").textContent;
-    const price = Number(priceText.replace(/[^0-9]/g, ""));
+<section class="section">
 
-    cartProducts.push({
-      name: name,
-      price: price
-    });
+<h2>Categories</h2>
 
-    updateCart();
-  });
-});
+<div class="cats">
 
-cart.addEventListener("click", function() {
-  cartBox.style.display = "block";
-});
+<button class="cat active" data-cat="All">🛍️ All</button>
+<button class="cat" data-cat="Electronics">📱 Electronics</button>
+<button class="cat" data-cat="Fashion">👕 Fashion</button>
+<button class="cat" data-cat="Food">🍔 Food</button>
+<button class="cat" data-cat="Computers">💻 Computers</button>
+<button class="cat" data-cat="Home">🏠 Home</button>
 
-function updateCart() {
+</div>
 
-  cart.textContent = "🛒 " + cartProducts.length;
+<div class="filters">
 
-  if (cartProducts.length === 0) {
-    cartItems.innerHTML = "Your cart is empty.";
-    cartTotal.textContent = "Total: ₦0";
-    return;
-  }
+<select id="priceFilter">
+<option value="all">All Prices</option>
+<option value="under">Under ₦50,000</option>
+<option value="mid">₦50,000 - ₦200,000</option>
+<option value="over">Over ₦200,000</option>
+</select>
 
-  cartItems.innerHTML = "";
+<select id="sortFilter">
+<option value="default">Recommended</option>
+<option value="low">Price: Low to High</option>
+<option value="high">Price: High to Low</option>
+</select>
 
-  let total = 0;
+</div>
+</section>
 
-  cartProducts.forEach(function(product, index) {
+<section class="section">
 
-    total += product.price;
+<h2>Featured Products</h2>
 
-    const item = document.createElement("div");
+<div class="grid" id="products"></div>
 
-    item.style.padding = "10px";
-    item.style.marginBottom = "10px";
-    item.style.background = "#f5f5f5";
-    item.style.borderRadius = "8px";
+</section>
 
-    item.innerHTML =
-      "<strong>" + product.name + "</strong>" +
-      "<br>₦" + product.price.toLocaleString();
+<footer>
+<b>Veyro Market</b>
+<p>Shop. Sell. Discover.</p>
+</footer>
 
-    const removeButton = document.createElement("button");
 
-    removeButton.textContent = "🗑️ Remove";
-    removeButton.style.marginTop = "8px";
-    removeButton.style.padding = "6px 10px";
-    removeButton.style.border = "none";
-    removeButton.style.borderRadius = "6px";
-    removeButton.style.background = "#111";
-    removeButton.style.color = "white";
+<div class="overlay" id="detailsModal">
 
-    removeButton.addEventListener("click", function() {
-      cartProducts.splice(index, 1);
-      updateCart();
-    });
+<div class="modal">
 
-    item.appendChild(removeButton);
-    cartItems.appendChild(item);
-  });
+<div class="mh">
+<h2>Product Details</h2>
 
-  cartTotal.textContent = "Total: ₦" + total.toLocaleString();
-}
+<button class="close" data-close="detailsModal">×</button>
+</div>
 
-function closeCart() {
-  cartBox.style.display = "none";
-}
-                </script>
-                </body>
-</html>
+<div class="details" id="details"></div>
+
+</div>
+</div>
+
+
+<div class="overlay" id="cartModal">
+
+<div class="modal">
+
+<div class="mh">
+<h2>Your Cart 🛒</h2>
+
+<button class="close" data-close="cartModal">×</button>
+</div>
+
+<div id="cartItems"></div>
+
+<div class="total">
+<span>Total</span>
+<span id="total">₦0</span>
+</div>
+
+<button class="btn dark" id="checkoutBtn">
+Proceed to Checkout
+</button>
+
+</div>
+</div>
+
+
+<div class="overlay" id="checkoutModal">
+
+<div class="modal">
+
+<div class="mh">
+<h2>Checkout 💳</h2>
+
+<button class="close" data-close="checkoutModal">×</button>
+</div>
+
+<div class="notice">
+Demo checkout only.
+Real payment will be connected later.
+</div>
+
+<form class="form" id="checkoutForm">
+
+<label>
+Full Name
+<input required>
+</label>
+
+<label>
+Phone Number
+<input type="tel" required>
+</label>
+
+<label>
+Delivery Address
+<textarea required></textarea>
+</label>
+
+<label>
+Payment Method
+
+<select>
+<option>Pay on delivery</option>
+<option>Online payment - coming soon</option>
+</select>
+
+</label>
+
+<button class="btn dark">
+Place Demo Order
+</button>
+
+</form>
+</div>
+</div>
+
+
+<div class="overlay" id="sellerModal">
+
+<div class="modal">
+
+<div class="mh">
+
+<h2>Seller Account 🏪</h2>
+
+<button class="close" data-close="sellerModal">×</button>
+
+</div>
+
+<div class="notice">
+Seller products are saved on this device for now.
+</div>
+
+<form class="form" id="sellerForm">
+
+<label>
+Seller Name
+<input id="sellerName" required>
+</label>
+
+<label>
+Product Name
+<input id="sellerProduct" required>
+</label>
+
+<label>
+Price (₦)
+<input id="sellerPrice" type="number" min="0" required>
+</label>
+
+<label>
+Category
+
+<select id="sellerCat">
+<option>Electronics</option>
+<option>Fashion</option>
+<option>Food</option>
+<option>Computers</option>
+<option>Home</option>
+</select>
+
+</
